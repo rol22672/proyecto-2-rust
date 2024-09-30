@@ -46,24 +46,121 @@ fn main() {
     let mut yaw = 0.0;
     let mut pitch = 0.0;
 
-    // Definir el material del cubo de césped utilizando la textura
-    let grass_material = Material::new(
-        Color::new(139, 69, 19),  // Color base café (brown)
-        0.6,                      // Albedo - reduced for a less reflective, more matte appearance
-        0.2,                      // Specular - lower value for non-shiny dirt
-        0.05,                     // Reflectividad - very low, as dirt isn't reflective
-        0.0,                      // Transparencia - unchanged, as dirt is not transparent
-        true,                     // Indicar que tiene textura
-        Some("textures/dirt.webp"), // Ruta de la textura
+    // Water Material (Blue)
+    let water_material = Material::new(
+        Color::new(0, 105, 148),   // Blue color
+        0.5,                       // Albedo
+        0.3,                       // Specular
+        0.1,                       // Reflectivity
+        0.0,                       // Transparency
+        false,                     // No texture
+        None,                      // No texture path
+    );
+
+    // Sand Material (Light Yellow)
+    let sand_material = Material::new(
+        Color::new(237, 201, 175), // Light sandy color
+        0.7,                       // Albedo
+        0.2,                       // Specular
+        0.05,                      // Reflectivity
+        0.0,                       // Transparency
+        false,                     // No texture
+        None,                      // No texture path
+    );
+
+    // Wood Material (Brown for the house and dock)
+    let wood_material = Material::new(
+        Color::new(139, 69, 19),   // Brown color
+        0.6,                       // Albedo
+        0.2,                       // Specular
+        0.05,                      // Reflectivity
+        0.0,                       // Transparency
+        false,                     // No texture
+        None,                      // No texture path
+    );
+
+    // Tree Leaves Material (Green)
+    let leaves_material = Material::new(
+        Color::new(34, 139, 34),   // Green color
+        0.8,                       // Albedo
+        0.3,                       // Specular
+        0.1,                       // Reflectivity
+        0.0,                       // Transparency
+        false,                     // No texture
+        None,                      // No texture path
     );
 
 
 
-    // Crear el cubo de césped en la posición central
-    let grass_cube = Cube::new(Vec3::new(0.0, 0.0, 0.0), 1.0, grass_material);
 
-    // Escena de objetos
-    let objects: Vec<Box<dyn RayIntersect>> = vec![Box::new(grass_cube)];
+    // Define the size of each cube
+    let cube_size = 1.0;
+
+    // Ground Layer (Water Cubes surrounding the island)
+    let water_cubes = vec![
+        Cube::new(Vec3::new(-2.0, -1.5, -2.0), cube_size, water_material.clone()),
+        Cube::new(Vec3::new(-1.0, -1.5, -2.0), cube_size, water_material.clone()),
+        Cube::new(Vec3::new(0.0, -1.5, -2.0), cube_size, water_material.clone()),
+        Cube::new(Vec3::new(1.0, -1.5, -2.0), cube_size, water_material.clone()),
+        Cube::new(Vec3::new(2.0, -1.5, -2.0), cube_size, water_material.clone()),
+
+        Cube::new(Vec3::new(-2.0, -1.5, -1.0), cube_size, water_material.clone()),
+        Cube::new(Vec3::new(2.0, -1.5, -1.0), cube_size, water_material.clone()),
+
+        Cube::new(Vec3::new(-2.0, -1.5, 0.0), cube_size, water_material.clone()),
+        Cube::new(Vec3::new(2.0, -1.5, 0.0), cube_size, water_material.clone()),
+
+        Cube::new(Vec3::new(-2.0, -1.5, 1.0), cube_size, water_material.clone()),
+        Cube::new(Vec3::new(-1.0, -1.5, 1.0), cube_size, water_material.clone()),
+        Cube::new(Vec3::new(0.0, -1.5, 1.0), cube_size, water_material.clone()),
+        Cube::new(Vec3::new(1.0, -1.5, 1.0), cube_size, water_material.clone()),
+        Cube::new(Vec3::new(2.0, -1.5, 1.0), cube_size, water_material.clone()),
+    ];
+
+    // Island (Sand Cubes)
+    let sand_cubes = vec![
+        Cube::new(Vec3::new(0.0, -1.0, 0.0), cube_size, sand_material.clone()),
+        Cube::new(Vec3::new(-1.0, -1.0, 0.0), cube_size, sand_material.clone()),
+        Cube::new(Vec3::new(1.0, -1.0, 0.0), cube_size, sand_material.clone()),
+        Cube::new(Vec3::new(0.0, -1.0, 1.0), cube_size, sand_material.clone()),
+        Cube::new(Vec3::new(0.0, -1.0, -1.0), cube_size, sand_material.clone()),
+    ];
+
+    // Small House (Wooden Cubes)
+    let house_cubes = vec![
+        Cube::new(Vec3::new(0.0, 0.0, 0.0), cube_size, wood_material.clone()), // Main structure
+        Cube::new(Vec3::new(0.0, 1.0, 0.0), cube_size, wood_material.clone()), // Second level
+    ];
+
+    // Palm Tree (Trunk and Leaves)
+    let palm_tree = vec![
+        // Trunk
+        Cube::new(Vec3::new(-0.5, 0.0, -0.5), cube_size * 0.2, wood_material.clone()),
+        Cube::new(Vec3::new(-0.5, 0.5, -0.5), cube_size * 0.2, wood_material.clone()),
+        Cube::new(Vec3::new(-0.5, 1.0, -0.5), cube_size * 0.2, wood_material.clone()),
+
+        // Leaves
+        Cube::new(Vec3::new(-0.5, 1.5, -0.5), cube_size * 0.5, leaves_material.clone()),
+        Cube::new(Vec3::new(-1.0, 1.5, -0.5), cube_size * 0.5, leaves_material.clone()),
+        Cube::new(Vec3::new(-0.5, 1.5, -1.0), cube_size * 0.5, leaves_material.clone()),
+        Cube::new(Vec3::new(0.0, 1.5, -0.5), cube_size * 0.5, leaves_material.clone()),
+        Cube::new(Vec3::new(-0.5, 1.5, 0.0), cube_size * 0.5, leaves_material.clone()),
+    ];
+
+    // Combine all the objects into a single vector
+    let mut objects: Vec<Box<dyn RayIntersect>> = Vec::new();
+    for cube in water_cubes {
+        objects.push(Box::new(cube));
+    }
+    for cube in sand_cubes {
+        objects.push(Box::new(cube));
+    }
+    for cube in house_cubes {
+        objects.push(Box::new(cube));
+    }
+    for cube in palm_tree {
+        objects.push(Box::new(cube));
+    }
 
     // Render loop
     event_loop.run(move |event, _, control_flow| {
